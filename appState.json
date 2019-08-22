@@ -1,0 +1,146 @@
+{
+  "EDITOR_STATE": {
+    "allProjectFiles": {
+      "6592fc69-de21-4940-a990-cef96afb70f4": {
+        "id": "6592fc69-de21-4940-a990-cef96afb70f4",
+        "parent": null,
+        "name": "chatDisconnect",
+        "type": "DIRECTORY",
+        "isDirectory": true,
+        "children": [
+          "2cda329c-4e82-4715-9ddf-82f0811aaccf",
+          "23bb2344-d695-4eef-8b82-431557aec60d"
+        ],
+        "isRemovable": false,
+        "filePath": "chatDisconnect"
+      },
+      "2cda329c-4e82-4715-9ddf-82f0811aaccf": {
+        "id": "2cda329c-4e82-4715-9ddf-82f0811aaccf",
+        "parent": "6592fc69-de21-4940-a990-cef96afb70f4",
+        "name": "lambda.js",
+        "type": "JS_LAMBDA",
+        "isDirectory": false,
+        "children": [],
+        "isRemovable": true,
+        "filePath": "chatDisconnect/lambda.js",
+        "code": "let SL_AWS = require('slappforge-sdk-aws');\nlet connectionManager = require('./ConnectionManager');\nconst rds = new SL_AWS.RDS(connectionManager);\n\nexports.handler = function (event, context, callback) {\n\n    // You can pass the existing connection to this function.\n    // A new connection will be created if it's not present as the third param \n    // You must always end/destroy the DB connection after it's used\n    rds.query({\n        instanceIdentifier: 'main',\n        query: 'DELETE FROM chat WHERE (connectionId=?);',\n        inserts: [event.requestContext.connectionId ]\n    }, function (error, results, connection) {\n        if (error) {\n            console.log(\"Error occurred\");\n            throw error;\n        } else {\n            console.log(\"Success\")\n            console.log(results);\n        }\n\n        connection.end();\n        callback(null, {\n        statusCode: error ? 500 : 200,\n            body: error ? \"Failed to disconnect: \" + JSON.stringify(error) : \"Disconnected.\"\n        });\n    });\n\n    \n}",
+        "config": {
+          "runtime": "nodejs8.10",
+          "handler": "handler",
+          "timeout": 60,
+          "memory": 128,
+          "layers": []
+        },
+        "triggers": [],
+        "testCases": {
+          "8061673c-d5f3-4b19-90ed-4264929d6126": {
+            "id": "8061673c-d5f3-4b19-90ed-4264929d6126",
+            "name": "Unnamed event",
+            "functionId": "2cda329c-4e82-4715-9ddf-82f0811aaccf",
+            "event": "{\n    \"requestContext\": {\n        \"connectionId\": 2\n    }\n}"
+          }
+        }
+      },
+      "23bb2344-d695-4eef-8b82-431557aec60d": {
+        "id": "23bb2344-d695-4eef-8b82-431557aec60d",
+        "parent": "6592fc69-de21-4940-a990-cef96afb70f4",
+        "name": "ConnectionManager.js",
+        "type": "JS_FILE",
+        "isDirectory": false,
+        "children": [],
+        "isRemovable": true,
+        "filePath": "chatDisconnect/ConnectionManager.js",
+        "code": "module.exports = function() {\n    this.dbConnections = [];\n\n    this.dbConnections[\"main\"] = {\n        host: \"main.c2guhaphxbdj.us-east-1.rds.amazonaws.com\",\n        port: \"3306\",\n        user: \"admin\",\n        password: process.env.Password_rdsMain,\n        database: \"Main\"\n    };\n};"
+      }
+    },
+    "deletedFiles": [],
+    "rootNode": "6592fc69-de21-4940-a990-cef96afb70f4",
+    "openFiles": [
+      "2cda329c-4e82-4715-9ddf-82f0811aaccf"
+    ],
+    "currentFileId": "2cda329c-4e82-4715-9ddf-82f0811aaccf",
+    "resources": {
+      "rds-main": {
+        "name": "rds-main",
+        "type": "RDS",
+        "config": {
+          "editMode": false,
+          "operation": 0,
+          "rdsInstance": {
+            "rdsEngineType": "mysql",
+            "rdsEdition": "mysql",
+            "rdsInstanceSpec": {
+              "dbInstanceClass": "db.t2.micro",
+              "dbLicenseModel": "general-public-license",
+              "dbEngineVersion": "5.7.19"
+            },
+            "rdsSetting": {
+              "instanceIdentifier": "main",
+              "masterUsername": "admin",
+              "masterPassword": "password"
+            },
+            "rdsDBOptions": {
+              "dbName": "Main",
+              "dbPort": 3306
+            },
+            "rdsInstanceArn": "arn:aws:rds:us-east-1:509688276117:db:main",
+            "Host": "main.c2guhaphxbdj.us-east-1.rds.amazonaws.com",
+            "doesExist": true
+          },
+          "rdsInstanceResources": [],
+          "projectRegion": "us-east-1",
+          "mode": 1,
+          "additionalFiles": [],
+          "params": {
+            "query": "DELETE FROM `Main`.`chat` WHERE (`idchat` = '1');",
+            "inserts": "0"
+          },
+          "isGlobalEditMode": false,
+          "enableInject": true,
+          "isNewFromGlobal": false
+        }
+      }
+    },
+    "customTemplate": {
+      "dialect": null,
+      "definitions": {}
+    },
+    "envVariables": [
+      {
+        "lambdaId": "all",
+        "varKey": "SIGMA_AWS_ACC_ID",
+        "varValue": null,
+        "shouldPersist": false,
+        "displayOnly": false,
+        "editable": false
+      }
+    ],
+    "packageJSON": {
+      "dependencies": {
+        "slappforge-sdk-aws": {
+          "name": "slappforge-sdk-aws",
+          "language": "javascript",
+          "version": "0.0.5",
+          "dev": false,
+          "notRemovable": false
+        }
+      }
+    }
+  },
+  "PROJECT_META": {
+    "projectName": "chatDisconnect",
+    "projectDescription": "",
+    "projectVersion": "1.0.0",
+    "projectRegion": "us-east-1",
+    "platform": "AWS",
+    "platformRegions": {},
+    "lastSave": 1566487390869
+  },
+  "VCS_STATE": {
+    "provider": "GitHub",
+    "repo": {
+      "name": "chatDisconnect",
+      "url": "https://github.com/ghariosk/chatDisconnect"
+    }
+  }
+}
